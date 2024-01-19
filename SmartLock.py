@@ -4,7 +4,11 @@ from time import sleep
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-GPIO.setup(12,GPIO.OUT) #set GPIO 18 as output
+GPIO.setup(18,GPIO.OUT) #set Buzzer as output
+GPIO.setup(26,GPIO.OUT) #set GPIO 26 as output
+
+#servo motor
+PWM=GPIO.PWM(26,50) #set 50Hz PWM output at GPIO26
 
 #lcd test
 LCD = I2C_LCD_driver.lcd() #instantiate an lcd object, call it LCD
@@ -35,6 +39,11 @@ for j in range(4):
 password = "123456"
 input = ""
 inputs = 0
+LCD.lcd_clear()
+sleep(0.5)
+LCD.lcd_display_string("Enter PIN", 1) #write on line 1
+sleep(0.5)
+print("Enter PIN")
 
 #scan keypad
 while (True):
@@ -43,29 +52,45 @@ while (True):
         for j in range(4): #check which row pin becomes low
             if GPIO.input(ROW[j])==0: #if a key is pressed
                 key_pressed = MATRIX[j][i]
-                input = input + key_pressed #add the keys into a PIN
-                inputs = inputs + 1 #increase number of inputs by 1
+                input = input + str(key_pressed) #add the keys into a PIN
+                inputs = inputs + 1 #increase nuamber of inputs by 1
                 print (MATRIX[j][i]) #print the key pressed in terminal
-                LCD.lcd_display_string("Enter PIN", 1) #write on line 1
+                print(inputs)
                 LCD.lcd_display_string(input, 2) #write on line 1
+                sleep(0.5)
+                print("Check Input")
+                if (inputs % 6 == 0): 
+                    print("Input is 6")                 
+                    if(input == password): #if the inputted pin is the same as password
+                        LCD.lcd_clear() #clear the LCD
+                        LCD.lcd_display_string("Access Granted", 1) #Access Granted
+                        print("Access Granted")
+                        PWM.start(3) #3% duty cycle
+                        print('duty cycle:', 3) #3 o'clock position
+                        sleep(4) #allow time for movement
+                        PWM.start(12) #13% duty cycle
+                        print('duty cycle:', 12) #9 o'clock position
+                        sleep(4) #allow time for movement
+                        inputs = 0 #reset inputs to 0
+                        input = "" #reset input to nothing
+                        print("Reset input to 0")
+                        break
+                    if(input != password):
+                        LCD.lcd_clear() #clear the LCD
+                        LCD.lcd_display_string("Access Denied", 1) #Access Denied
+                        print("Access Denied")
+                        if(inputs == 18): #after 3 wrong attempts 
+                            print("3 Attempts Wrong!!")
+                            for x in range(3):
+                                GPIO.output(18,1) #Buzzer output logic high/'1'
+                                sleep(0.5) #delay 1 second
+                                GPIO.output(18,0) #Buzzer output logic low/'0'
+                                sleep(0.5) #delay 1 second
+                            break
                 while GPIO.input(ROW[j])==0: #debounce
                     sleep(0.5)
         GPIO.output(COL[i],1) #write back default value of 1
         #check if pin is 6 numbers (remainder 0)
-        if (inputs % 6 == 0):
-            if(input == password): #if the inputted pin is the same as password
-                LCD.lcd_clear() #clear the LCD
-                LCD.lcd_display_string("Access Granted", 1) #Access Granted
-                input = "" #reset input to nothing
-            else:
-                LCD.lcd_clear() #clear the LCD
-                LCD.lcd_display_string("Access Denied", 1) #Access Denied
-                if(inputs == 18): #after 3 wrong attempts 
-                    print("3 Attempts Wrong!!")
-                    GPIO.output(12,1) #Buzzer output logic high/'1'
-                    sleep(1) #delay 1 second
-                    GPIO.output(18,0) #Buzzer output logic low/'0'
-                    sleep(1) #delay 1 second
                     
                     
                     
