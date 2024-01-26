@@ -91,6 +91,3 @@ while (True):
                     sleep(0.5)
         GPIO.output(COL[i],1) #write back default value of 1
         #check if pin is 6 numbers (remainder 0)
-                    
-                    
-                    
