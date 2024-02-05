@@ -44,12 +44,12 @@ while(True):
             engine.runAndWait()
         if(words == "light on"):
             print("Light On")
-            GPIO.output(24,1) #output logic high/'1'
+            GPIO.output(24,1) #Turn on LED
             engine.say("Turning on light")
             engine.runAndWait()
         if(words == "light off"):
             print("Light off")
-            GPIO.output(24,0) #output logic low/'0'
+            GPIO.output(24,0) #Turn off LED
             engine.say("Turning off light")
             engine.runAndWait()
         if(words == "open the door"):
@@ -66,20 +66,20 @@ while(True):
             engine.say("Closing door")
             engine.runAndWait()
             PWM.start(12) #13% duty cycle
-            print('duty cycle:', 12) #9 o'clock position
+            print('duty cycle:', 12) #12 o'clock position
             time.sleep(3) #allow time for movement
         if(words == "turn on fan"):
             time.sleep(2)
             print("Turning on Fan")
             engine.say("Turning on Fan")
             engine.runAndWait()
-            GPIO.output(23,1) #output logic high/'1'
+            GPIO.output(23,1) #Turn on DC Motor
         if(words == "turn off fan"):
             time.sleep(2)
             print("Turning off fan")
             engine.say("Turning off fan")
             engine.runAndWait()
-            GPIO.output(23,0) #output logic low/'0'
+            GPIO.output(23,0) #Turn on DC Motor
         if(words == "how's the weather"):
             result = instance.read()
             while(True):
@@ -100,10 +100,19 @@ while(True):
             engine.runAndWait()
             GPIO.output(24,1) #Turn on LED
             PWM.start(12) #13% duty cycle
-            print('duty cycle:', 12) #9 o'clock position
+            print('duty cycle:', 12) #12 o'clock position
             time.sleep(3) #allow time for movement
             GPIO.output(23,1) #Turn on Fan
-            
+        if(words == "I'm leaving"):
+            engine.say("Goodbye")
+            engine.runAndWait()
+            GPIO.output(24,0) #Turn off LED
+            PWM.start(3) #3% duty cycle
+            print('duty cycle:', 3) #3 o'clock position
+            time.sleep(3) #allow time for movement
+            GPIO.output(23,0) #Turn off Fan
+        
+        
             
                     
             
